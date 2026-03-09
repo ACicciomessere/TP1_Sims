@@ -10,9 +10,11 @@ import java.util.Scanner;
 public class App {
     public static void main(String[] args) {
         if (args.length < 6) {
-            System.out.println("HELP (File Mode): java -cp src App <StaticPath> <DynamicPath> <M> <rc> <periodic (true/false)> <target_id>");
-            System.out.println("HELP (Random Mode): java -cp src App <N> <L> <M> <rc> <periodic (true/false)> <target_id>");
-            return;
+            System.err.println(
+                    "HELP (File Mode): java -cp src App <StaticPath> <DynamicPath> <M> <rc> <periodic (true/false)> <target_id>");
+            System.err.println(
+                    "HELP (Random Mode): java -cp src App <N> <L> <M> <rc> <periodic (true/false)> <target_id>");
+            System.exit(1);
         }
 
         int M = Integer.parseInt(args[2]);
@@ -53,10 +55,12 @@ public class App {
                     for (Particle p : particles) {
                         double dx = Math.abs(rx - p.getX());
                         double dy = Math.abs(ry - p.getY());
-                        
+
                         if (periodic) {
-                            if (dx > L / 2) dx = L - dx;
-                            if (dy > L / 2) dy = L - dy;
+                            if (dx > L / 2)
+                                dx = L - dx;
+                            if (dy > L / 2)
+                                dy = L - dy;
                         }
 
                         double minDistance = radius + p.getRadius();
@@ -102,12 +106,18 @@ public class App {
                 dynamicScanner.close();
 
             } catch (FileNotFoundException e) {
-                System.out.println("Error reading input files: " + e.getMessage());
-                return;
+                System.err.println("Error reading input files: " + e.getMessage());
+                System.exit(1);
             }
         }
 
         System.out.println("Successfully parsed " + N + " particles.");
+
+        if (L / M <= rc) {
+            System.err.println("Error: The condition L/M > rc is not met. (L/M=" + (L / M) + ", rc=" + rc + ")");
+            System.err.println("Execution stopped to prevent loss of neighbors.");
+            System.exit(1);
+        }
 
         // Ejecuta Cell Index Method para calcular los vecinos
         cellIndexMethod(particles, L, M, rc, periodic);

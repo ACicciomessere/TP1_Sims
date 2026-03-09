@@ -50,22 +50,24 @@ python3 python/visualize.py
 
 ## 4. Ejecución con visualización en 1 comando
 
+Existe un script `run.sh` en la raíz del proyecto que compila Java, ejecuta el método CIM y, si finaliza de forma exitosa (L/M > rc), abre la visualización en Python de manera automática.
+
 (Usando archivos):
 ```bash
-cd java && javac -cp . *.java && java -cp . App <StaticPath> <DynamicPath> <M> <rc> <periodic (true/false)> <target_id> && cd .. && python3 python/visualize.py
+./run.sh <StaticPath> <DynamicPath> <M> <rc> <periodic (true/false)> <target_id>
 ```
 
 Ejemplo:
 ```bash
-cd java && javac -cp . *.java && java -cp . App ../files/Static100.txt ../files/Dynamic100.txt 13 2.0 true 9 && cd .. && python3 python/visualize.py
+./run.sh ../files/Static100.txt ../files/Dynamic100.txt 13 2.0 true 9
 ```
 
 (Usando generación interna aleatoria):
 ```bash
-cd java && javac -cp . *.java && java -cp . App <N> <L> <M> <rc> <periodic (true/false)> <target_id> && cd .. && python3 python/visualize.py
+./run.sh <N> <L> <M> <rc> <periodic (true/false)> <target_id>
 ```
 
 Ejemplo:
 ```bash
-cd java && javac -cp . *.java && java -cp . App 100 20.0 13 2.0 true 9 && cd .. && python3 python/visualize.py
+./run.sh 100 20.0 13 2.0 true 9
 ```
