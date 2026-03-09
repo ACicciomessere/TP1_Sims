@@ -7,13 +7,14 @@ def main():
         print("Error: particles.txt not found. Run the Java simulation first.")
         return
 
+    # load basic particle information
     particles = {}
     with open('particles.txt', 'r') as f:
         N = int(f.readline().strip())
         L = float(f.readline().strip())
         M = int(f.readline().strip())
-        target_global = int(f.readline().strip())
-        
+        _ = f.readline().strip()  # placeholder target id written by generator (ignored)
+
         for _ in range(N):
             parts = f.readline().strip().split()
             p_id = int(parts[0])
@@ -22,21 +23,30 @@ def main():
             radius = float(parts[3])
             prop = float(parts[4])
             particles[p_id] = (x, y, radius, prop)
-            
-        # Parse target particle and its neighbors
-        target_line = f.readline()
-        neighbors_line = f.readline()
-        
-        target = -1
-        neighbors = set()
-        
-        if target_line and target_line.startswith("TARGET"):
-            target = int(target_line.strip().split()[1])
-            
-        if neighbors_line and neighbors_line.startswith("NEIGHBORS"):
-            parts = neighbors_line.strip().split()
-            if len(parts) > 1:
-                neighbors = set(int(n) for n in parts[1:])
+
+    # ask user which particle to analyze
+    try:
+        target = int(input("Enter target particle id: "))
+    except Exception:
+        print("Invalid input, using 0 as default target.")
+        target = 0
+
+    # read neighbours from output.txt
+    neighbors = set()
+    if os.path.exists('output.txt'):
+        with open('output.txt', 'r') as f:
+            for line in f:
+                line = line.strip()
+                if not line or line[0] != '[':
+                    continue
+                tokens = line.replace('[', '').replace(']', '').split()
+                pid = int(tokens[0])
+                if pid == target:
+                    for tok in tokens[1:]:
+                        neighbors.add(int(tok))
+                    break
+    else:
+        print("Warning: output.txt not found, neighbour information unavailable.")
 
     fig, ax = plt.subplots(figsize=(8, 8))
     ax.set_xlim(0, L)

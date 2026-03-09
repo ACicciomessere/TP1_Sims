@@ -15,10 +15,9 @@ javac -cp . *.java
 
 ## 2. Ejecución de la Simulación
 
-El programa puede correr de dos maneras:
 **A) Proveyendo archivos de configuración (Recomendado):**
 ```bash
-java -cp . App <StaticPath> <DynamicPath> <M> <rc> <periodic (true/false)> <target_id>
+java -cp . App <StaticPath> <DynamicPath> <M> <rc> <periodic (true/false)>
 ```
 
 Ejemplo:
@@ -28,7 +27,7 @@ java -cp . App ../files/Static100.txt ../files/Dynamic100.txt 13 2.0 true 9
 
 **B) Generando partículas aleatorias internamente:**
 ```bash
-java -cp . App <N> <L> <M> <rc> <periodic (true/false)> <target_id>
+java -cp . App <N> <L> <M> <rc> <periodic (true/false)>
 ```
 
 Ejemplo:
@@ -43,31 +42,25 @@ java -cp . InputGenerator <N> <L> <OutputPrefix>
 
 ## 3. Visualización
 
+Llame a `target.sh`, que invoca el script Python; éste solicitará el id de la partícula y leerá la información de `output.txt` para colorear sus vecinos. Tenga en cuenta que si no corre run.sh previamente no existira 
+
 ```bash
-cd ..
 python3 python/visualize.py
 ```
 
-## 4. Ejecución con visualización en 1 comando
+## 4. Scripts auxiliares
 
-Existe un script `run.sh` en la raíz del proyecto que compila Java, ejecuta el método CIM y, si finaliza de forma exitosa (L/M > rc), abre la visualización en Python de manera automática.
+* `run.sh` – compila el código Java y genera `particles.txt` / `output.txt`. No realiza ninguna visualización.
+  1. `cd java && javac -cp . *.java`
+  2. Ejecuta `App` con los argumentos proporcionados.
 
-(Usando archivos):
+* `target.sh` – verifica que `particles.txt` y `output.txt` existen y lanza el script de visualización interactiva `python3 python/visualize.py`, que pedirá el id de la partícula objetivo y pintará sus vecinos.
+
+**Uso típico:**
 ```bash
-./run.sh <StaticPath> <DynamicPath> <M> <rc> <periodic (true/false)> <target_id>
-```
-
-Ejemplo:
-```bash
-./run.sh ../files/Static100.txt ../files/Dynamic100.txt 13 2.0 true 9
-```
-
-(Usando generación interna aleatoria):
-```bash
-./run.sh <N> <L> <M> <rc> <periodic (true/false)> <target_id>
-```
-
-Ejemplo:
-```bash
-./run.sh 100 20.0 13 2.0 true 9
+# generar datos (usar archivos o valores aleatorios, omitir target_id)
+./run.sh ../files/Static100.txt ../files/Dynamic100.txt 13 2.0 true
+# luego iniciar la visualización interactiva
+./target.sh
+# el script pedirá el ID y mostrará la gráfica correspondiente
 ```

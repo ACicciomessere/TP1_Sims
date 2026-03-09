@@ -9,18 +9,21 @@ import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) {
-        if (args.length < 6) {
-            System.err.println(
-                    "HELP (File Mode): java -cp src App <StaticPath> <DynamicPath> <M> <rc> <periodic (true/false)> <target_id>");
-            System.err.println(
-                    "HELP (Random Mode): java -cp src App <N> <L> <M> <rc> <periodic (true/false)> <target_id>");
+        
+        if (args.length < 5) {
+            System.err.println("HELP (File Mode): java -cp src App <StaticPath> <DynamicPath> <M> <rc> <periodic (true/false)> [target_id]");
+            System.err.println("HELP (Random Mode): java -cp src App <N> <L> <M> <rc> <periodic (true/false)> [target_id]");
             System.exit(1);
         }
 
         int M = Integer.parseInt(args[2]);
         double rc = Double.parseDouble(args[3]);
         boolean periodic = Boolean.parseBoolean(args[4]);
-        int targetId = Integer.parseInt(args[5]);
+        int targetId = -1;
+        boolean hasTarget = args.length >= 6;
+        if (hasTarget) {
+            targetId = Integer.parseInt(args[5]);
+        }
 
         ArrayList<Particle> particles = new ArrayList<>();
         double L = 0.0;
@@ -122,8 +125,8 @@ public class App {
         // Ejecuta Cell Index Method para calcular los vecinos
         cellIndexMethod(particles, L, M, rc, periodic);
 
-        // Exportar data para visualize.py
-        exportData(N, L, M, targetId, particles);
+        // Exportar data para visualize.py (se indica si hubo target)
+        exportData(N, L, M, targetId, hasTarget, particles);
     }
 
     public static double getDistance(Particle p1, Particle p2, double L, boolean periodic) {
@@ -238,7 +241,7 @@ public class App {
         return diff;
     }
 
-    private static void exportData(int N, double L, int M, int targetId, ArrayList<Particle> particles) {
+    private static void exportData(int N, double L, int M, int targetId, boolean hasTarget, ArrayList<Particle> particles) {
         // Exporte en el formato especifico TP: [id n1 n2 ...]
         try (FileWriter outWriter = new FileWriter("../output.txt")) {
             for (Particle p : particles) {
@@ -258,20 +261,23 @@ public class App {
             writer.write(N + "\n");
             writer.write(L + "\n");
             writer.write(M + "\n");
-            writer.write(targetId + "\n");
+            // if no target was requested, write -1 as placeholder
+            writer.write((hasTarget ? targetId : -1) + "\n");
             for (Particle p : particles) {
                 writer.write(p.getId() + " " + p.getX() + " " + p.getY() + " " + p.getRadius() + " " + p.getProperty()
                         + "\n");
             }
 
-            Particle target = particles.stream().filter(p -> p.getId() == targetId).findFirst().orElse(null);
-            if (target != null) {
-                writer.write("TARGET " + targetId + "\n");
-                writer.write("NEIGHBORS");
-                for (Particle n : target.getNeighbours()) {
-                    writer.write(" " + n.getId());
+            if (hasTarget) {
+                Particle target = particles.stream().filter(p -> p.getId() == targetId).findFirst().orElse(null);
+                if (target != null) {
+                    writer.write("TARGET " + targetId + "\n");
+                    writer.write("NEIGHBORS");
+                    for (Particle n : target.getNeighbours()) {
+                        writer.write(" " + n.getId());
+                    }
+                    writer.write("\n");
                 }
-                writer.write("\n");
             }
 
             System.out.println("Exported particle data for visualization to particles.txt");
