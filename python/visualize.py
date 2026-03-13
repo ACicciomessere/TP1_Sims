@@ -65,6 +65,9 @@ def main():
         if p_id == target:
             color = 'red'
             zorder = 5
+            # Draw the interaction radius (rc) of the selected particle colored in red
+            interaction_circle = patches.Circle((x, y), radius + prop, edgecolor='red', facecolor='none', linestyle='dashed', zorder=6)
+            ax.add_patch(interaction_circle)
         elif p_id in neighbors:
             color = 'yellow'
             zorder = 4
@@ -74,8 +77,8 @@ def main():
             
         circle = patches.Circle((x, y), radius, edgecolor='black', facecolor=color, alpha=0.8, zorder=zorder)
         ax.add_patch(circle)
-        # Optional: Add ID labels
-        # ax.text(x, y, str(p_id), color='black', fontsize=8, ha='center', va='center')
+        # Add ID labels inside the particles
+        ax.text(x, y, str(p_id), color='black', fontsize=8, ha='center', va='center', zorder=10)
 
     plt.xlabel('X coordinate')
     plt.ylabel('Y coordinate')
