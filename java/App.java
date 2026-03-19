@@ -11,17 +11,21 @@ public class App {
     public static void main(String[] args) {
         
         if (args.length < 5) {
-            System.err.println("HELP (File Mode): java -cp src App <StaticPath> <DynamicPath> <M> <rc> <periodic (true/false)> [target_id]");
-            System.err.println("HELP (Random Mode): java -cp src App <N> <L> <M> <rc> <periodic (true/false)> [target_id]");
+            System.err.println("HELP (File Mode): java -cp src App <StaticPath> <DynamicPath> <M> <rc> <periodic (true/false)>");
+            System.err.println("HELP (Random Mode): java -cp src App <N> <L> <M> <rc> <periodic (true/false)>");
             System.exit(1);
         }
 
+        //recibimos los parametros desde la terminal, al correr run.sh
         int M = Integer.parseInt(args[2]);
         double rc = Double.parseDouble(args[3]);
         boolean periodic = Boolean.parseBoolean(args[4]);
         int targetId = -1;
         boolean hasTarget = args.length >= 6;
-        if (hasTarget) {
+
+        //en principio esto está deprecated porq ahora esta separado lo del target, 
+        // pero lo dejamos por si vuelve a ser util en el futuro 
+        if (hasTarget) { 
             targetId = Integer.parseInt(args[5]);
         }
 
@@ -31,6 +35,7 @@ public class App {
 
         boolean isRandomMode = false;
         try {
+            //tmb parametros desde la terminal, en este caso serian números fijos
             N = Integer.parseInt(args[0]);
             L = Double.parseDouble(args[1]);
             isRandomMode = true;
@@ -40,11 +45,13 @@ public class App {
 
         if (isRandomMode) {
             System.out.println("Running in Random Mode...");
+            //los limites marcados en el tp1
             double r_min = 0.23;
             double r_max = 0.26;
             double property = 1.0;
             java.util.Random rand = new java.util.Random();
 
+            //le inventamos posiciones y radios a las N partículas q pedimos, chequeando que no se superpongan entre si.
             for (int i = 0; i < N; i++) {
                 boolean overlaps;
                 double rx, ry, radius;
@@ -78,6 +85,7 @@ public class App {
             }
         } else {
             System.out.println("Running in File Mode...");
+            //tmb desde la terminal, en este caso serian archivos
             String staticPath = args[0];
             String dynamicPath = args[1];
 
@@ -87,8 +95,6 @@ public class App {
 
                 N = Integer.parseInt(staticScanner.nextLine().trim());
                 L = Double.parseDouble(staticScanner.nextLine().trim());
-
-                double time = Double.parseDouble(dynamicScanner.nextLine().trim()); // read t0
 
                 for (int i = 0; i < N; i++) {
                     String[] staticParts = staticScanner.nextLine().trim().split("\\s+");
@@ -102,6 +108,7 @@ public class App {
                     double vx = dynamicParts.length > 2 ? Double.parseDouble(dynamicParts[2]) : 0.0;
                     double vy = dynamicParts.length > 3 ? Double.parseDouble(dynamicParts[3]) : 0.0;
 
+                    //en este caso no se hacen todos los chequeos como en el anterior porq se asume q los archivos son correctos TODO
                     particles.add(new Particle(i, rx, ry, vx, vy, radius, property));
                 }
 
@@ -125,7 +132,7 @@ public class App {
         // Ejecuta Cell Index Method para calcular los vecinos
         cellIndexMethod(particles, L, M, rc, periodic);
 
-        // Exportar data para visualize.py (se indica si hubo target)
+        // Exportar data para visualize.py 
         exportData(N, L, M, targetId, hasTarget, particles);
     }
 
@@ -143,6 +150,7 @@ public class App {
         return Math.sqrt(dx * dx + dy * dy) - p1.getRadius() - p2.getRadius();
     }
 
+    //se usa en benchmark.java para comparar tiempos de ejecución entre ambos métodos
     public static long bruteForce(ArrayList<Particle> particles, double L, double rc, boolean periodic) {
         for (Particle p : particles)
             p.clearNeighbours();
@@ -225,6 +233,7 @@ public class App {
                                 // consigo misma
                                 if (p1.getId() < p2.getId()) {
                                     if (getDistance(p1, p2, L, periodic) <= rc) {
+                                        //ahorramos iteraciones al agregar a ambos vecinos entre si al mismo tiempo
                                         p1.addNeighbour(p2);
                                         p2.addNeighbour(p1);
                                     }

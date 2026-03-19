@@ -10,6 +10,7 @@ public class Benchmark {
     // Archivo usado para comparar brute force y cell index method
     // Y buscar el M optimo
     public static void main(String[] args) {
+        //xd los estamos metiendo hardcodeados los datos TODO
         double L = 20.0;
         double rc = 1.0;
         boolean periodic = true;
@@ -55,7 +56,9 @@ public class Benchmark {
                 double[] cimTimes = new double[runs];
                 System.out.println("Running for M=" + M);
 
+                //acá pasa la real shit 
                 for (int r = 0; r < runs; r++) {
+                    //de vuelta, es a partir de los valores hardcodeados
                     ArrayList<Particle> particles = generateParticles(fixed_N, L, r_min, r_max, periodic);
                     bfTimes[r] = App.bruteForce(particles, L, rc, periodic) / 1_000_000.0;
                     cimTimes[r] = App.cellIndexMethod(particles, L, M, rc, periodic) / 1_000_000.0;

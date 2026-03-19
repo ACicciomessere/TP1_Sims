@@ -4,6 +4,8 @@ import java.util.Random;
 
 public class InputGenerator {
 
+    //Es lo q dice el nombre
+
     public static void main(String[] args) {
         if (args.length < 3) {
             System.out.println("HELP: java -cp src InputGenerator <N> <L> <OutputPrefix>");
